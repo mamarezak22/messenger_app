@@ -9,7 +9,8 @@ from .managers import UserManager
 # Create your models here.
 
 class User(AbstractBaseUser):
-    phone_number = models.CharField(max_length=11, unique=True,validators=[validate_phone_number],primary_key=True)
+    id = models.BigAutoField()
+    phone_number = models.CharField(max_length=11, unique=True,validators=[validate_phone_number])
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     joined_in = models.DateTimeField(auto_now_add = True)
@@ -17,6 +18,9 @@ class User(AbstractBaseUser):
     #because a user can be contact of another user.but it's not 2way.its 1way.
     contacts = models.ManyToManyField(to = "User",related_name="contact_of",symmetrical=False)
     blocked_users = models.ManyToManyField(to = "User",related_name="blocked_by",symmetrical=False)
+
+    is_online = models.BooleanField(default = False)
+    last_seen = models.DateTimeField(default = timezone.now())
 
     objects = UserManager()
     USERNAME_FIELD = 'phone_number'
@@ -32,8 +36,6 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=128)
     username = models.CharField(max_length=128,validators=[validate_user_name],null=True,unique = True)
     about_me = models.TextField(null=True)
-    is_online = models.BooleanField(default = False)
-    last_seen = models.DateTimeField(default = timezone.now())
 
     # def get_picture_upload_path(self):
     #     return f"uploads/pictures/{self.name}/"
