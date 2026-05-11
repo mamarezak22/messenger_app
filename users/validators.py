@@ -8,7 +8,7 @@ class PhoneNumberValidator(RegexValidator):
 
 
 class UserNameValidator(RegexValidator):
-        regex = "^[a-zA-Z][a-zA-Z0-9_]{4,31}$"
+        regex = "^@[a-zA-Z][a-zA-Z0-9_]{4,31}$"
         code = "invalid username"
         message = "invalid username"
 

@@ -25,7 +25,7 @@ class SetNameSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("phone_number","is_online","last_seen",)
+        fields = ("id","phone_number","is_online","last_seen",)
     
     def get_phone_number(self,obj):
         request = self.context.get("request")
@@ -78,11 +78,11 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfilePictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfilePicture
-        fields = ["content","is_primary"]
+        fields = ["id","content","is_primary"]
 
 class UserProfileOutputSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only = True)
-    pictures = ProfilePictureSerializer(many = True)
+    pictures = serializers.SerializerMethodField()
     class Meta:
         model = UserProfile 
         fields = ["user","name","username","about_me","pictures"]
@@ -99,13 +99,12 @@ class UserProfileOutputSerializer(serializers.ModelSerializer):
                                                       target_field="profile_pic") 
             
             if can_access:
-                return obj.is_online
+                qs = obj.user.pictures.all()  
+                return ProfilePictureSerializer(qs, many=True, context=self.context).data 
         return None
 
 
 class UserProfileInputSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only = True)
-    pictures = ProfilePictureSerializer(many = True)
     class Meta:
         model = UserProfile 
         fields = ["name","username","about_me"]
@@ -118,4 +117,4 @@ class PictureInputSerializer(serializers.Serializer):
 class PrivacySettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPrivacySettings 
-        fields = ["__all__"]
+        fields = ["is_online","last_seen","profile_pic","phone_number"] 
